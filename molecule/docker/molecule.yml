@@ -12,7 +12,7 @@ lint:
   name: yamllint
 platforms:
   - name: homelab-systemd-local
-    image: homelab-systemd:local
+    image: ${MOLECULE_DOCKER_IMAGE:-"homelab-systemd:local"}
     command: "/sbin/init"
     tmpfs:
       - /run
