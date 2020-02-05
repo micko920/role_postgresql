@@ -11,12 +11,20 @@ driver:
 lint:
   name: yamllint
 platforms:
-  - name: homelab-local
-    image: ${MOLECULE_DOCKER_IMAGE:-"homelab:local"}
+  - name: homelab-systemd-local
+    image: ${MOLECULE_DOCKER_IMAGE:-"homelab-systemd:local"}
+    command: "/sbin/init"
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     pre_build_image: true
+    capabilities:
+      - SYS_ADMIN
 provisioner:
   name: ansible
-  log: true
   lint:
     name: ansible-lint
   inventory:
