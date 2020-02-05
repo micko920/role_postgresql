@@ -28,6 +28,7 @@
   command: "{{ postgresql_bin_path }}/pg_ctl status -D {{ postgresql_config_path }}"
   register: pg_ctlout
   when: systemd_pid_1 is not defined
+  failed_when: false
   changed_when: false
 
 - name: Start PostgreSQL in background mode
