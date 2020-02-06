@@ -24,7 +24,7 @@
 
 - name: Is PostgreSQL in background mode
   become: true
-  become_user: postgres
+  become_user: "{{ postgresql_user }}"
   command: "{{ postgresql_bin_path }}/pg_ctl status -D {{ postgresql_config_path }}"
   register: pg_ctlout
   when: systemd_pid_1 is not defined
@@ -33,9 +33,8 @@
 
 - name: Start PostgreSQL in background mode
   become: true
-  become_user: postgres
-  command: "{{ postgresql_bin_path }}/pg_ctl -w start -D {{ postgresql_config_path }}"
-  register: pg_ctlout
+  become_user: "{{ postgresql_user }}"
+  command: "{{ postgresql_bin_path }}/pg_ctl -t 1800 -w start -D {{ postgresql_config_path }}"
   when:
     - systemd_pid_1 is not defined
     - pg_ctlout.stdout.find('server is running') == -1
@@ -43,3 +42,21 @@
 # Configure PostgreSQL.
 - import_tasks: users.yml
 - import_tasks: databases.yml
+
+- name: Force a restart if configuration has changed.
+  meta: flush_handlers
+
+- name: final postgresql state
+  become: true
+  become_user: "{{ postgresql_user }}"
+  command: "{{ postgresql_bin_path }}/pg_ctl -t 180 -w {{ postgresql_final_state }} -D {{ postgresql_config_path }}"
+  when: systemd_pid_1 is not defined
+
+- name: Is PostgreSQL in background mode
+  become: true
+  become_user: "{{ postgresql_user }}"
+  command: "{{ postgresql_bin_path }}/pg_ctl status -D {{ postgresql_config_path }}"
+  register: pg_ctlout
+  when: systemd_pid_1 is not defined
+  failed_when: false
+  changed_when: false

@@ -6,12 +6,6 @@
     sleep: 5
   when: systemd_pid_1 is defined and systemd_pid_1
 
-- name: restart postgresql
-  become: true
-  become_user: postgres
-  command: "{{ postgresql_bin_path }}/pg_ctl -w restart -D {{ postgresql_config_path }}"
-  when: systemd_pid_1 is not defined
-
 # - name: Force-restart PostgreSQL after new locales are generated.
 #   service:
 #     name: "{{ postgresql_daemon }}"
