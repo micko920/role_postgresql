@@ -15,12 +15,12 @@
 - include_tasks: configure.yml
 
 
-- name: Ensure PostgreSQL is started and enabled on boot.
+- name: Start Postgresql for configuration
   systemd:
     name: "{{ postgresql_daemon }}"
     state: "{{ postgresql_service_state }}"
-    enabled: "{{ postgresql_service_enabled }}"
   when: systemd_pid_1 is defined and systemd_pid_1
+  changed_when: false
 
 - name: Is PostgreSQL in background mode
   become: true
@@ -35,6 +35,7 @@
   become: true
   become_user: "{{ postgresql_user }}"
   command: "{{ postgresql_bin_path }}/pg_ctl -t 1800 -w start -D {{ postgresql_config_path }}"
+  changed_when: false
   when:
     - systemd_pid_1 is not defined
     - pg_ctlout.stdout.find('server is running') == -1
@@ -56,4 +57,5 @@
   systemd:
     name: "{{ postgresql_daemon }}"
     state: "{{ postgresql_final_state }}"
+    enabled: "{{ postgresql_service_enabled }}"
   when: systemd_pid_1 is defined and systemd_pid_1
