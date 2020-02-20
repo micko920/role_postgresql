@@ -66,4 +66,3 @@
     enabled: "{{ postgresql_service_enabled }}"
   when: systemd_pid_1 is defined and systemd_pid_1
   changed_when: false
-
